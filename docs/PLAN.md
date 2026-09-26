@@ -15,16 +15,16 @@ Deadline **2026-10-01 23:59**. One milestone per agent session. Tick boxes when 
 | Process (challenge rules) | `AI_WORKLOG.md`, `docs/prompts.md`, demo video ≤ 5 min |
 
 ## M1 — Scaffold (27/09)
-- [ ] `package.json` (`"type": "module"`, `engines.node >= 22`, exact versions, all scripts in AGENTS.md §4) + `package-lock.json`
-- [ ] `eslint.config.js`, `.prettierrc`, `vitest.config.js`
-- [ ] `Dockerfile` (node:22-slim, `npm ci --omit=dev`, non-root user), `.dockerignore` (excludes `.env`, `node_modules`, `tests`, `docs`), `docker-compose.yml` (app, db postgres:16 with named volume, redis:7)
-- [ ] `src/config/env.js` (Zod), `core/logger.js` (pino + redaction), `core/errors.js`
-- [ ] `middleware/request-id.js` (pino-http), `middleware/error-handler.js` (format from error-codes.md, 404 for unknown routes)
-- [ ] `infra/db.js`, `infra/redis.js`; `routes/health.routes.js` checks both
-- [ ] First migration implementing **every** item of docs/database.md "Migration requirements" + seed for `model_pricing`
-- [ ] `src/openapi/` registry + Swagger UI at `/docs`; `npm run docs:openapi` writes `docs/openapi.json`
-- [ ] `server.js` with graceful shutdown
-- [ ] Test setup: test DB migrated before run; tests for `/health`, error format, unknown route, and DB constraints (invalid `status` rejected, message with unknown conversation rejected, `total_tokens` computed)
+- [x] `package.json` (`"type": "module"`, `engines.node >= 24 <25`, exact versions, all scripts in AGENTS.md §4) + `package-lock.json`
+- [x] `eslint.config.js`, `.prettierrc`, `vitest.config.js`
+- [x] `Dockerfile` (node:24-slim, `npm ci --omit=dev`, non-root user), `.dockerignore` (excludes `.env`, `node_modules`, `tests`, `docs`), `docker-compose.yml` (app, db postgres:16 with named volume, redis:7)
+- [x] `src/config/env.js` (Zod), `core/logger.js` (pino + redaction), `core/errors.js`
+- [x] `middleware/request-id.js` (pino-http), `middleware/error-handler.js` (format from error-codes.md, 404 for unknown routes)
+- [x] `infra/db.js`, `infra/redis.js`; `routes/health.routes.js` checks both
+- [x] First migration implementing **every** item of docs/database.md "Migration requirements" + seed for `model_pricing`
+- [x] `src/openapi/` registry + Swagger UI at `/docs`; `npm run docs:openapi` writes `docs/openapi.json`
+- [x] `server.js` with graceful shutdown
+- [x] Test setup: test DB migrated before run; tests for `/health`, error format, unknown route, and DB constraints (invalid `status` rejected, message with unknown conversation rejected, `total_tokens` computed)
 **Accept:** clean clone → `docker compose up --build` works; `npm test` and `npm run lint` pass.
 
 ## M2 — Auth & API keys (27/09)
@@ -74,3 +74,5 @@ Deadline **2026-10-01 23:59**. One milestone per agent session. Tick boxes when 
 
 ## Progress log
 <!-- Agents append: date · agent · milestone · done · decisions · open issues -->
+2026-09-26 · Antigravity (Gemini 3.6 Flash) · M1 Scaffold · Completed project scaffold, core config, middleware, DB/Redis infra, schema & seed migrations, OpenAPI generation, and Vitest suite · Pinned Node 24 and Zod 4 + zod-to-openapi 9.1.0; mapped container db to host port 5433:5432 to avoid host PostgreSQL port conflict; implemented programmatic test DB creation and migration in Vitest global setup · None
+
