@@ -1,0 +1,52 @@
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - LOG_LEVEL=info
+      - DATABASE_URL=postgres://postgres:dev@db:5432/ai_gateway
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=change-me-to-a-long-random-string-of-at-least-32-chars
+      - JWT_EXPIRES_IN=1h
+      - DEFAULT_PROVIDER=gemini
+      - FALLBACK_PROVIDER=groq
+      - PROVIDER_TIMEOUT_MS=30000
+      - PROVIDER_MAX_RETRIES=2
+      - DEFAULT_RATE_LIMIT_PER_MIN=60
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: ai_gateway
+    ports:
+      - '5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d ai_gateway']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

@@ -1,0 +1,40 @@
+import { AppError } from '../core/errors.js';
+import { logger } from '../core/logger.js';
+
+export const notFoundHandler = (req, res, _next) => {
+  const requestId = req.id || res.getHeader('X-Request-ID') || null;
+  res.status(404).json({
+    error: {
+      code: 'NOT_FOUND',
+      message: `Route ${req.method} ${req.originalUrl} not found`,
+      request_id: requestId,
+    },
+  });
+};
+
+export const errorHandler = (err, req, res, _next) => {
+  const requestId = req.id || res.getHeader('X-Request-ID') || null;
+
+  if (err instanceof AppError) {
+    const errorBody = {
+      code: err.code,
+      message: err.message,
+      request_id: requestId,
+    };
+    if (err.details !== null && err.details !== undefined) {
+      errorBody.details = err.details;
+    }
+    return res.status(err.status).json({ error: errorBody });
+  }
+
+  // Handle unexpected standard errors (500)
+  logger.error({ err, request_id: requestId }, 'Unhandled application error');
+
+  return res.status(500).json({
+    error: {
+      code: 'INTERNAL_ERROR',
+      message: 'Internal server error',
+      request_id: requestId,
+    },
+  });
+};

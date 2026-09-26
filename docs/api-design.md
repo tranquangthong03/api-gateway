@@ -15,6 +15,8 @@ Errors: see `error-codes.md`.
 | Method | Path | Auth | Success |
 |---|---|---|---|
 | GET | `/health` | none | 200 `{ status, db, redis }` |
+
+`/health` returns 503 with the `HealthResponse` shape (not the standard error format) so callers can see which dependency failed.
 | POST | `/v1/auth/register` | none | 201 user (never includes the hash) |
 | POST | `/v1/auth/login` | none | 200 `{ access_token, token_type, expires_in }` |
 | POST | `/v1/api-keys` | JWT only | 201 key created (raw key shown once) |
