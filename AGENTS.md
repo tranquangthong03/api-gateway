@@ -146,3 +146,6 @@ Remove a folder's `.gitkeep` once it contains real files.
 ## 12. Definition of done (per milestone)
 Criteria met · lint + format clean · tests pass · no secrets in code, logs or image ·
 docs updated if behaviour changed · PLAN.md progress log updated.
+
+- Git is read-only for agents: `git status`, `git diff`, `git log` are allowed; never run
+  checkout, switch, commit, push, pull, merge, reset, stash or branch commands.
