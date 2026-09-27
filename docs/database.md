@@ -4,6 +4,7 @@ ERD: `images/erd.png` · DBML source: `schema.dbml` · Generated DDL: `schema.sq
 This file is the approved spec for migrations.
 
 ## Tables
+
 **users** — id uuid PK default gen_random_uuid() · email varchar(255) UNIQUE NOT NULL ·
 password_hash varchar(255) NOT NULL (bcrypt) · full_name varchar(100) NULL ·
 role varchar(20) NOT NULL default 'user' · is_active boolean NOT NULL default true ·
@@ -37,6 +38,7 @@ effective_from timestamptz NOT NULL default now() · is_active boolean NOT NULL 
 UNIQUE (provider, model, effective_from)
 
 ## Migration requirements (all mandatory)
+
 1. `total_tokens int GENERATED ALWAYS AS (input_tokens + output_tokens) STORED` — no DEFAULT, never written by code.
 2. CHECK: `users.role IN ('user','admin')`; `messages.role IN ('system','user','assistant')`;
    `ai_requests.status IN ('success','error')`; `ai_requests.endpoint IN ('chat','analyze')`;
@@ -50,7 +52,9 @@ UNIQUE (provider, model, effective_from)
 6. Seed `model_pricing` for the configured models using the providers' current pricing pages.
 
 ## Usage metrics (`GET /v1/usage`)
+
 One aggregate query over `ai_requests`, filtered by `user_id` (unless admin) and `created_at` in `[from, to)`:
+
 - `requests = COUNT(*)`
 - `tokens = COALESCE(SUM(total_tokens), 0)`
 - `average_latency_ms = ROUND(AVG(latency_ms))` — includes failed requests
@@ -58,9 +62,11 @@ One aggregate query over `ai_requests`, filtered by `user_id` (unless admin) and
 - `estimated_cost_usd = SUM(cost_usd)`; `by_model` = the same aggregates grouped by `model`
 
 ## Conversation history
+
 Last 20 messages in chronological order: inner query `ORDER BY created_at DESC LIMIT 20`, outer query `ORDER BY created_at ASC`.
 
 ## Design decisions
+
 - **`ai_requests` is the only source of token and cost data.** `messages` stores content only; the two are linked 1-1 by `message_id`.
 - **No denormalized counters** on `conversations` (lost updates under concurrent requests); counts are computed with `COUNT`/`SUM`.
 - **`status` is success/error only; the reason goes to `error_code`**, so `error_rate` counts timeouts correctly.

@@ -21,6 +21,7 @@
     "ioredis": "6.0.0",
     "jsonwebtoken": "9.0.3",
     "node-pg-migrate": "9.0.0",
+    "openai": "7.23.0",
     "pg": "8.23.0",
     "pino": "10.3.1",
     "pino-http": "11.0.0",

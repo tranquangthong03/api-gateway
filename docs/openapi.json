@@ -29,31 +29,18 @@
         "properties": {
           "status": {
             "type": "string",
-            "enum": [
-              "ok",
-              "error"
-            ]
+            "enum": ["ok", "error"]
           },
           "db": {
             "type": "string",
-            "enum": [
-              "ok",
-              "error"
-            ]
+            "enum": ["ok", "error"]
           },
           "redis": {
             "type": "string",
-            "enum": [
-              "ok",
-              "error"
-            ]
+            "enum": ["ok", "error"]
           }
         },
-        "required": [
-          "status",
-          "db",
-          "redis"
-        ]
+        "required": ["status", "db", "redis"]
       },
       "ErrorResponse": {
         "type": "object",
@@ -79,16 +66,10 @@
                 }
               }
             },
-            "required": [
-              "code",
-              "message",
-              "request_id"
-            ]
+            "required": ["code", "message", "request_id"]
           }
         },
-        "required": [
-          "error"
-        ]
+        "required": ["error"]
       },
       "RegisterInput": {
         "type": "object",
@@ -107,10 +88,7 @@
             "maxLength": 100
           }
         },
-        "required": [
-          "email",
-          "password"
-        ]
+        "required": ["email", "password"]
       },
       "LoginInput": {
         "type": "object",
@@ -123,10 +101,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "email",
-          "password"
-        ]
+        "required": ["email", "password"]
       },
       "UserResponse": {
         "type": "object",
@@ -150,12 +125,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "email",
-          "role",
-          "created_at"
-        ]
+        "required": ["id", "email", "role", "created_at"]
       },
       "LoginResponse": {
         "type": "object",
@@ -165,19 +135,13 @@
           },
           "token_type": {
             "type": "string",
-            "enum": [
-              "Bearer"
-            ]
+            "enum": ["Bearer"]
           },
           "expires_in": {
             "type": "number"
           }
         },
-        "required": [
-          "access_token",
-          "token_type",
-          "expires_in"
-        ]
+        "required": ["access_token", "token_type", "expires_in"]
       },
       "MeResponse": {
         "type": "object",
@@ -195,18 +159,10 @@
           },
           "auth_type": {
             "type": "string",
-            "enum": [
-              "jwt",
-              "api_key"
-            ]
+            "enum": ["jwt", "api_key"]
           }
         },
-        "required": [
-          "user_id",
-          "email",
-          "role",
-          "auth_type"
-        ]
+        "required": ["user_id", "email", "role", "auth_type"]
       },
       "CreateApiKeyInput": {
         "type": "object",
@@ -222,9 +178,7 @@
             "exclusiveMinimum": true
           }
         },
-        "required": [
-          "name"
-        ]
+        "required": ["name"]
       },
       "ApiKeyResponse": {
         "type": "object",
@@ -321,9 +275,7 @@
       "get": {
         "summary": "Health check",
         "description": "Checks connectivity to PostgreSQL database and Redis cache.",
-        "tags": [
-          "System"
-        ],
+        "tags": ["System"],
         "responses": {
           "200": {
             "description": "Service is fully healthy",
@@ -339,31 +291,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "ok",
-                        "error"
-                      ]
+                      "enum": ["ok", "error"]
                     },
                     "db": {
                       "type": "string",
-                      "enum": [
-                        "ok",
-                        "error"
-                      ]
+                      "enum": ["ok", "error"]
                     },
                     "redis": {
                       "type": "string",
-                      "enum": [
-                        "ok",
-                        "error"
-                      ]
+                      "enum": ["ok", "error"]
                     }
                   },
-                  "required": [
-                    "status",
-                    "db",
-                    "redis"
-                  ]
+                  "required": ["status", "db", "redis"]
                 }
               }
             }
@@ -382,31 +321,18 @@
                   "properties": {
                     "status": {
                       "type": "string",
-                      "enum": [
-                        "ok",
-                        "error"
-                      ]
+                      "enum": ["ok", "error"]
                     },
                     "db": {
                       "type": "string",
-                      "enum": [
-                        "ok",
-                        "error"
-                      ]
+                      "enum": ["ok", "error"]
                     },
                     "redis": {
                       "type": "string",
-                      "enum": [
-                        "ok",
-                        "error"
-                      ]
+                      "enum": ["ok", "error"]
                     }
                   },
-                  "required": [
-                    "status",
-                    "db",
-                    "redis"
-                  ]
+                  "required": ["status", "db", "redis"]
                 }
               }
             }
@@ -417,9 +343,7 @@
     "/v1/auth/register": {
       "post": {
         "summary": "Register a new user",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "responses": {
           "201": {
             "description": "User created successfully",
@@ -447,12 +371,7 @@
                       "type": "string"
                     }
                   },
-                  "required": [
-                    "id",
-                    "email",
-                    "role",
-                    "created_at"
-                  ]
+                  "required": ["id", "email", "role", "created_at"]
                 }
               }
             }
@@ -469,9 +388,7 @@
     "/v1/auth/login": {
       "post": {
         "summary": "User login",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "responses": {
           "200": {
             "description": "Login successful",
@@ -485,19 +402,13 @@
                     },
                     "token_type": {
                       "type": "string",
-                      "enum": [
-                        "Bearer"
-                      ]
+                      "enum": ["Bearer"]
                     },
                     "expires_in": {
                       "type": "number"
                     }
                   },
-                  "required": [
-                    "access_token",
-                    "token_type",
-                    "expires_in"
-                  ]
+                  "required": ["access_token", "token_type", "expires_in"]
                 }
               }
             }
@@ -511,9 +422,7 @@
     "/v1/auth/me": {
       "get": {
         "summary": "Get current caller info",
-        "tags": [
-          "Auth"
-        ],
+        "tags": ["Auth"],
         "security": [
           {
             "BearerAuth": []
@@ -543,18 +452,10 @@
                     },
                     "auth_type": {
                       "type": "string",
-                      "enum": [
-                        "jwt",
-                        "api_key"
-                      ]
+                      "enum": ["jwt", "api_key"]
                     }
                   },
-                  "required": [
-                    "user_id",
-                    "email",
-                    "role",
-                    "auth_type"
-                  ]
+                  "required": ["user_id", "email", "role", "auth_type"]
                 }
               }
             }
@@ -568,9 +469,7 @@
     "/v1/api-keys": {
       "post": {
         "summary": "Create an API key",
-        "tags": [
-          "API Keys"
-        ],
+        "tags": ["API Keys"],
         "security": [
           {
             "BearerAuth": []
@@ -635,9 +534,7 @@
       },
       "get": {
         "summary": "List user API keys",
-        "tags": [
-          "API Keys"
-        ],
+        "tags": ["API Keys"],
         "security": [
           {
             "BearerAuth": []
@@ -709,9 +606,7 @@
     "/v1/api-keys/{id}": {
       "delete": {
         "summary": "Revoke an API key",
-        "tags": [
-          "API Keys"
-        ],
+        "tags": ["API Keys"],
         "security": [
           {
             "BearerAuth": []

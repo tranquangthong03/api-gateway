@@ -14,7 +14,7 @@ export const verifyJwt = (token) => {
     return jwt.verify(token, env.JWT_SECRET, {
       algorithms: ['HS256'],
     });
-  } catch (_err) {
+  } catch {
     throw createUnauthorizedError('Authentication required');
   }
 };
