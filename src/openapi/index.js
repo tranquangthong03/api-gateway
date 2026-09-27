@@ -18,6 +18,8 @@ import {
   apiKeyResponseSchema,
   apiKeyListResponseSchema,
 } from '../schemas/api-key.schema.js';
+import { chatSchema, analyzeSchema } from '../schemas/ai.schema.js';
+import { listConversationsSchema } from '../schemas/conversation.schema.js';
 
 extendZodWithOpenApi(z);
 
@@ -33,6 +35,8 @@ registry.register('MeResponse', meResponseSchema);
 registry.register('CreateApiKeyInput', createApiKeySchema);
 registry.register('ApiKeyResponse', apiKeyResponseSchema);
 registry.register('ApiKeyListResponse', apiKeyListResponseSchema);
+registry.register('ChatInput', chatSchema);
+registry.register('AnalyzeInput', analyzeSchema);
 
 const securityBearer = registry.registerComponent('securitySchemes', 'BearerAuth', {
   type: 'http',
@@ -210,6 +214,86 @@ registry.registerPath({
     401: { description: 'Authentication required' },
     403: { description: 'API keys cannot manage API keys' },
     404: { description: 'Resource not found' },
+  },
+});
+
+// AI Endpoints
+registry.registerPath({
+  method: 'post',
+  path: '/v1/ai/chat',
+  summary: 'Multi-turn chat completion',
+  tags: ['AI'],
+  security: [{ [securityBearer.name]: [] }, { [securityApiKey.name]: [] }],
+  request: {
+    content: {
+      'application/json': {
+        schema: chatSchema,
+      },
+    },
+  },
+  responses: {
+    200: { description: 'Chat completion successful' },
+    400: { description: 'Validation error' },
+    401: { description: 'Authentication required' },
+    404: { description: 'Conversation not found' },
+    502: { description: 'Provider error' },
+    504: { description: 'Provider timeout' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/v1/ai/analyze',
+  summary: 'Structured text analysis',
+  tags: ['AI'],
+  security: [{ [securityBearer.name]: [] }, { [securityApiKey.name]: [] }],
+  request: {
+    content: {
+      'application/json': {
+        schema: analyzeSchema,
+      },
+    },
+  },
+  responses: {
+    200: { description: 'Text analysis successful' },
+    400: { description: 'Validation error' },
+    401: { description: 'Authentication required' },
+    502: { description: 'Provider or output validation error' },
+    504: { description: 'Provider timeout' },
+  },
+});
+
+// Conversations
+registry.registerPath({
+  method: 'get',
+  path: '/v1/conversations',
+  summary: 'List user conversations',
+  tags: ['Conversations'],
+  security: [{ [securityBearer.name]: [] }, { [securityApiKey.name]: [] }],
+  request: {
+    query: listConversationsSchema,
+  },
+  responses: {
+    200: { description: 'List of conversations' },
+    401: { description: 'Authentication required' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/v1/conversations/{id}',
+  summary: 'Get conversation details with message history',
+  tags: ['Conversations'],
+  security: [{ [securityBearer.name]: [] }, { [securityApiKey.name]: [] }],
+  request: {
+    params: z.object({
+      id: z.string().uuid(),
+    }),
+  },
+  responses: {
+    200: { description: 'Conversation details' },
+    401: { description: 'Authentication required' },
+    404: { description: 'Conversation not found' },
   },
 });
 

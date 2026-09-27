@@ -266,6 +266,45 @@
             "created_at"
           ]
         }
+      },
+      "ChatInput": {
+        "type": "object",
+        "properties": {
+          "conversation_id": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": ["message"]
+      },
+      "AnalyzeInput": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "type": "string",
+            "enum": ["sentiment", "summarize", "extract"]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "model": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": ["task", "text"]
       }
     },
     "parameters": {}
@@ -635,6 +674,153 @@
           },
           "404": {
             "description": "Resource not found"
+          }
+        }
+      }
+    },
+    "/v1/ai/chat": {
+      "post": {
+        "summary": "Multi-turn chat completion",
+        "tags": ["AI"],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Chat completion successful"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Conversation not found"
+          },
+          "502": {
+            "description": "Provider error"
+          },
+          "504": {
+            "description": "Provider timeout"
+          }
+        }
+      }
+    },
+    "/v1/ai/analyze": {
+      "post": {
+        "summary": "Structured text analysis",
+        "tags": ["AI"],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Text analysis successful"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "502": {
+            "description": "Provider or output validation error"
+          },
+          "504": {
+            "description": "Provider timeout"
+          }
+        }
+      }
+    },
+    "/v1/conversations": {
+      "get": {
+        "summary": "List user conversations",
+        "tags": ["Conversations"],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "nullable": true,
+              "minimum": 0,
+              "default": 0
+            },
+            "required": false,
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of conversations"
+          },
+          "401": {
+            "description": "Authentication required"
+          }
+        }
+      }
+    },
+    "/v1/conversations/{id}": {
+      "get": {
+        "summary": "Get conversation details with message history",
+        "tags": ["Conversations"],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Conversation details"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "404": {
+            "description": "Conversation not found"
           }
         }
       }
