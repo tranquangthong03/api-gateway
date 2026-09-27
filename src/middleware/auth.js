@@ -67,6 +67,7 @@ export const authMiddleware = async (req, res, next) => {
       req.apiKey = {
         id: key.id,
         name: key.name,
+        rate_limit_per_min: key.rate_limit_per_min,
       };
       req.authType = 'api_key';
       return next();

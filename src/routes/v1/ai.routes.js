@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { validateBody } from '../../middleware/validate.js';
 import { authMiddleware } from '../../middleware/auth.js';
+import { rateLimitMiddleware } from '../../middleware/rate-limit.js';
 import { chatSchema, analyzeSchema } from '../../schemas/ai.schema.js';
 import { executeChat } from '../../services/chat.service.js';
 import { executeAnalyze } from '../../services/analyze.service.js';
@@ -8,6 +9,7 @@ import { executeAnalyze } from '../../services/analyze.service.js';
 export const aiRouter = Router();
 
 aiRouter.use(authMiddleware);
+aiRouter.use(rateLimitMiddleware);
 
 aiRouter.post('/chat', validateBody(chatSchema), async (req, res, next) => {
   try {

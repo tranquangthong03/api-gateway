@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { validateQuery, validateParams } from '../../middleware/validate.js';
 import { authMiddleware } from '../../middleware/auth.js';
+import { rateLimitMiddleware } from '../../middleware/rate-limit.js';
 import {
   listConversationsSchema,
   conversationIdParamsSchema,
@@ -10,6 +11,7 @@ import { listConversations, getConversationDetail } from '../../services/convers
 export const conversationsRouter = Router();
 
 conversationsRouter.use(authMiddleware);
+conversationsRouter.use(rateLimitMiddleware);
 
 conversationsRouter.get('/', validateQuery(listConversationsSchema), async (req, res, next) => {
   try {

@@ -297,6 +297,21 @@ registry.registerPath({
   },
 });
 
+// Usage
+registry.registerPath({
+  method: 'get',
+  path: '/v1/usage',
+  summary: 'Get usage metrics and aggregates',
+  tags: ['Usage'],
+  security: [{ [securityBearer.name]: [] }, { [securityApiKey.name]: [] }],
+  responses: {
+    200: { description: 'Usage analytics metrics' },
+    400: { description: 'Validation error' },
+    401: { description: 'Authentication required' },
+    403: { description: 'Forbidden (admin role required for user_id filter)' },
+  },
+});
+
 export function generateOpenApiDocument() {
   const generator = new OpenApiGeneratorV3(registry.definitions);
   return generator.generateDocument({
