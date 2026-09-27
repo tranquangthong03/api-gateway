@@ -47,10 +47,10 @@ Deadline **2026-10-01 23:59**. One milestone per agent session. Tick boxes when 
 
 ## M4 — AI endpoints & conversations (28/09)
 
-- [ ] `llm/tasks.js` (sentiment, summarize, extract: prompt + Zod schema)
-- [ ] `POST /v1/ai/chat` (user message saved before the LLM call, last 20 messages as history)
-- [ ] `POST /v1/ai/analyze` (schema validation, one repair attempt)
-- [ ] `GET /v1/conversations`, `GET /v1/conversations/{id}`
+- [x] `llm/tasks.js` (sentiment, summarize, extract: prompt + Zod schema)
+- [x] `POST /v1/ai/chat` (user message saved before the LLM call, last 20 messages as history)
+- [x] `POST /v1/ai/analyze` (schema validation, one repair attempt)
+- [x] `GET /v1/conversations`, `GET /v1/conversations/{id}`
       **Accept:** integration tests with fake providers; other user's conversation → 404; invalid output → 502.
 
 ## M5 — Rate limit, usage, cache (29/09)
@@ -88,3 +88,4 @@ Deadline **2026-10-01 23:59**. One milestone per agent session. Tick boxes when 
 2026-09-26 · Antigravity (Gemini 3.6 Flash) · M1 Scaffold · Completed project scaffold, core config, middleware, DB/Redis infra, schema & seed migrations, OpenAPI generation, and Vitest suite · Pinned Node 24 and Zod 4 + zod-to-openapi 9.1.0; mapped container db to host port 5433:5432 to avoid host PostgreSQL port conflict; implemented programmatic test DB creation and migration in Vitest global setup · None
 2026-09-26 · Antigravity (Gemini 3.6 Flash) · M2 Auth & API Keys · Implemented register/login endpoints, API key CRUD operations, GET /v1/auth/me, HS256 JWT & SHA-256 API key authentication middleware, OpenAPI documentation, and full integration test suite · Enforced HS256 JWT verification algorithm pinning; normalized email input to lowercase; returned identical 401 message for unknown email and wrong password; disabled X-Powered-By header · None
 2026-09-27 · Antigravity (Gemini 3.6 Flash) · M3 LLM Core · Implemented provider base class, Gemini/Groq adapters via openai SDK (maxRetries: 0), retry with exponential backoff & jitter, model pricing repository, cost calculator, ai_requests repository, orchestrator engine with routing, fallbacks, repair attempts, and comprehensive unit tests · Mapped model to provider dynamically; client_error (401/404) skips adapter retry but triggers fallback provider; missing usage defaults to 0 tokens with warning log; saveAssistantMessageFn failure writes ai_requests error row before throwing 500 · None
+2026-09-27 · Antigravity (Gemini 3.6 Flash) · M4 AI Endpoints & Conversations · Implemented POST /v1/ai/chat with transaction user message save and 20-message prompt history, POST /v1/ai/analyze for sentiment/summarize/extract tasks with code fence stripping, GET /v1/conversations (paginated list) and GET /v1/conversations/{id} (chronological history), OpenAPI documentation, Vitest integration tests, and live walkthrough against real providers · Returned HTTP 200 for both chat and analyze; attached conversation_id in error.details on LLM failures post-user message save; coerced limit and offset to numbers in pagination; updated validateQuery/validateParams to mutate property values instead of reassigning req.query/req.params getters · None

@@ -4,11 +4,13 @@ import { notFoundHandler, errorHandler } from './middleware/error-handler.js';
 import { healthRouter } from './routes/health.routes.js';
 import { v1Router } from './routes/v1/index.js';
 import { swaggerUiMiddleware, swaggerUiHandler } from './openapi/index.js';
+import { LLMOrchestrator } from './llm/orchestrator.js';
 
-export const createApp = () => {
+export const createApp = ({ orchestrator = new LLMOrchestrator() } = {}) => {
   const app = express();
 
   app.disable('x-powered-by');
+  app.set('orchestrator', orchestrator);
 
   app.use(requestIdMiddleware);
   app.use(express.json());
