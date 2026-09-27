@@ -6,7 +6,29 @@ import { redis } from './infra/redis.js';
 
 const app = createApp();
 
-const server = app.listen(env.PORT, () => {
+const checkProviderConfig = (providerName) => {
+  if (!providerName) return;
+  const prefix = providerName.toUpperCase();
+  const apiKey = env[`${prefix}_API_KEY`];
+  const baseUrl = env[`${prefix}_BASE_URL`];
+  const model = env[`${prefix}_MODEL`];
+  if (!apiKey || !baseUrl || !model) {
+    logger.warn(
+      {
+        provider: providerName,
+        has_api_key: Boolean(apiKey),
+        has_base_url: Boolean(baseUrl),
+        has_model: Boolean(model),
+      },
+      `Incomplete configuration for provider: ${providerName}`,
+    );
+  }
+};
+
+checkProviderConfig(env.DEFAULT_PROVIDER);
+checkProviderConfig(env.FALLBACK_PROVIDER);
+
+const server = app.listen(env.PORT, '0.0.0.0', () => {
   logger.info({ port: env.PORT, env: env.NODE_ENV }, 'AI Gateway HTTP server listening');
 });
 
