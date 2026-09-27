@@ -19,6 +19,7 @@ Errors: see `error-codes.md`.
 `/health` returns 503 with the `HealthResponse` shape (not the standard error format) so callers can see which dependency failed.
 | POST | `/v1/auth/register` | none | 201 user (never includes the hash) |
 | POST | `/v1/auth/login` | none | 200 `{ access_token, token_type, expires_in }` |
+| GET | `/v1/auth/me` | key or JWT | 200 `{ user_id, email, role, auth_type }` |
 | POST | `/v1/api-keys` | JWT only | 201 key created (raw key shown once) |
 | GET | `/v1/api-keys` | JWT only | 200 list (prefix only) |
 | DELETE | `/v1/api-keys/{id}` | JWT only | 204 |

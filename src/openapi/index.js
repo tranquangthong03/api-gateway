@@ -6,6 +6,18 @@ import {
 import swaggerUi from 'swagger-ui-express';
 import { z } from 'zod';
 import { healthResponseSchema, errorResponseSchema } from '../schemas/health.schema.js';
+import {
+  registerSchema,
+  loginSchema,
+  userResponseSchema,
+  loginResponseSchema,
+  meResponseSchema,
+} from '../schemas/auth.schema.js';
+import {
+  createApiKeySchema,
+  apiKeyResponseSchema,
+  apiKeyListResponseSchema,
+} from '../schemas/api-key.schema.js';
 
 extendZodWithOpenApi(z);
 
@@ -13,7 +25,28 @@ export const registry = new OpenAPIRegistry();
 
 registry.register('HealthResponse', healthResponseSchema);
 registry.register('ErrorResponse', errorResponseSchema);
+registry.register('RegisterInput', registerSchema);
+registry.register('LoginInput', loginSchema);
+registry.register('UserResponse', userResponseSchema);
+registry.register('LoginResponse', loginResponseSchema);
+registry.register('MeResponse', meResponseSchema);
+registry.register('CreateApiKeyInput', createApiKeySchema);
+registry.register('ApiKeyResponse', apiKeyResponseSchema);
+registry.register('ApiKeyListResponse', apiKeyListResponseSchema);
 
+const securityBearer = registry.registerComponent('securitySchemes', 'BearerAuth', {
+  type: 'http',
+  scheme: 'bearer',
+  bearerFormat: 'JWT',
+});
+
+const securityApiKey = registry.registerComponent('securitySchemes', 'ApiKeyAuth', {
+  type: 'apiKey',
+  in: 'header',
+  name: 'X-API-Key',
+});
+
+// System
 registry.registerPath({
   method: 'get',
   path: '/health',
@@ -26,27 +59,157 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: healthResponseSchema,
-          example: {
-            status: 'ok',
-            db: 'ok',
-            redis: 'ok',
-          },
+          example: { status: 'ok', db: 'ok', redis: 'ok' },
         },
       },
     },
     503: {
-      description: 'Service is degraded or unhealthy (Database or Redis connection failed)',
+      description: 'Service is degraded or unhealthy',
       content: {
         'application/json': {
           schema: healthResponseSchema,
-          example: {
-            status: 'error',
-            db: 'error',
-            redis: 'ok',
-          },
+          example: { status: 'error', db: 'error', redis: 'ok' },
         },
       },
     },
+  },
+});
+
+// Auth
+registry.registerPath({
+  method: 'post',
+  path: '/v1/auth/register',
+  summary: 'Register a new user',
+  tags: ['Auth'],
+  request: {
+    content: {
+      'application/json': {
+        schema: registerSchema,
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: 'User created successfully',
+      content: {
+        'application/json': {
+          schema: userResponseSchema,
+        },
+      },
+    },
+    400: { description: 'Validation error' },
+    409: { description: 'Email already registered' },
+  },
+});
+
+registry.registerPath({
+  method: 'post',
+  path: '/v1/auth/login',
+  summary: 'User login',
+  tags: ['Auth'],
+  request: {
+    content: {
+      'application/json': {
+        schema: loginSchema,
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Login successful',
+      content: {
+        'application/json': {
+          schema: loginResponseSchema,
+        },
+      },
+    },
+    401: { description: 'Invalid email or password' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/v1/auth/me',
+  summary: 'Get current caller info',
+  tags: ['Auth'],
+  security: [{ [securityBearer.name]: [] }, { [securityApiKey.name]: [] }],
+  responses: {
+    200: {
+      description: 'Current authenticated caller info',
+      content: {
+        'application/json': {
+          schema: meResponseSchema,
+        },
+      },
+    },
+    401: { description: 'Authentication required' },
+  },
+});
+
+// API Keys
+registry.registerPath({
+  method: 'post',
+  path: '/v1/api-keys',
+  summary: 'Create an API key',
+  tags: ['API Keys'],
+  security: [{ [securityBearer.name]: [] }],
+  request: {
+    content: {
+      'application/json': {
+        schema: createApiKeySchema,
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: 'API key created successfully',
+      content: {
+        'application/json': {
+          schema: apiKeyResponseSchema,
+        },
+      },
+    },
+    401: { description: 'Authentication required' },
+    403: { description: 'API keys cannot manage API keys' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/v1/api-keys',
+  summary: 'List user API keys',
+  tags: ['API Keys'],
+  security: [{ [securityBearer.name]: [] }],
+  responses: {
+    200: {
+      description: 'List of API keys',
+      content: {
+        'application/json': {
+          schema: apiKeyListResponseSchema,
+        },
+      },
+    },
+    401: { description: 'Authentication required' },
+    403: { description: 'API keys cannot manage API keys' },
+  },
+});
+
+registry.registerPath({
+  method: 'delete',
+  path: '/v1/api-keys/{id}',
+  summary: 'Revoke an API key',
+  tags: ['API Keys'],
+  security: [{ [securityBearer.name]: [] }],
+  request: {
+    params: z.object({
+      id: z.string().uuid(),
+    }),
+  },
+  responses: {
+    204: { description: 'API key revoked' },
+    401: { description: 'Authentication required' },
+    403: { description: 'API keys cannot manage API keys' },
+    404: { description: 'Resource not found' },
   },
 });
 

@@ -16,8 +16,10 @@
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "9.1.0",
+    "bcryptjs": "3.0.3",
     "express": "5.2.1",
     "ioredis": "6.0.0",
+    "jsonwebtoken": "9.0.3",
     "node-pg-migrate": "9.0.0",
     "pg": "8.23.0",
     "pino": "10.3.1",

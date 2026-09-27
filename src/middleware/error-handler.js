@@ -27,6 +27,17 @@ export const errorHandler = (err, req, res, _next) => {
     return res.status(err.status).json({ error: errorBody });
   }
 
+  // Handle Express body-parser JSON syntax error (400)
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'Invalid JSON body syntax',
+        request_id: requestId,
+      },
+    });
+  }
+
   // Handle unexpected standard errors (500)
   logger.error({ err, request_id: requestId }, 'Unhandled application error');
 

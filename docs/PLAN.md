@@ -28,10 +28,10 @@ Deadline **2026-10-01 23:59**. One milestone per agent session. Tick boxes when 
 **Accept:** clean clone → `docker compose up --build` works; `npm test` and `npm run lint` pass.
 
 ## M2 — Auth & API keys (27/09)
-- [ ] `core/jwt.js`, `core/password.js`, `core/api-key.js`
-- [ ] register / login; API key create / list / revoke
-- [ ] `middleware/auth.js`: Bearer JWT or `X-API-Key`; checks revoked, expired, user active; updates `last_used_at`
-- [ ] Permission rules from api-design.md
+- [x] `core/jwt.js`, `core/password.js`, `core/api-key.js`
+- [x] register / login; API key create / list / revoke
+- [x] `middleware/auth.js`: Bearer JWT or `X-API-Key`; checks revoked, expired, user active; updates `last_used_at`
+- [x] Permission rules from api-design.md
 **Accept:** tests for valid / invalid / revoked / expired key, expired JWT, 403 when an API key manages keys, 409 duplicate email.
 
 ## M3 — LLM core (28/09)
@@ -75,4 +75,6 @@ Deadline **2026-10-01 23:59**. One milestone per agent session. Tick boxes when 
 ## Progress log
 <!-- Agents append: date · agent · milestone · done · decisions · open issues -->
 2026-09-26 · Antigravity (Gemini 3.6 Flash) · M1 Scaffold · Completed project scaffold, core config, middleware, DB/Redis infra, schema & seed migrations, OpenAPI generation, and Vitest suite · Pinned Node 24 and Zod 4 + zod-to-openapi 9.1.0; mapped container db to host port 5433:5432 to avoid host PostgreSQL port conflict; implemented programmatic test DB creation and migration in Vitest global setup · None
+2026-09-26 · Antigravity (Gemini 3.6 Flash) · M2 Auth & API Keys · Implemented register/login endpoints, API key CRUD operations, GET /v1/auth/me, HS256 JWT & SHA-256 API key authentication middleware, OpenAPI documentation, and full integration test suite · Enforced HS256 JWT verification algorithm pinning; normalized email input to lowercase; returned identical 401 message for unknown email and wrong password; disabled X-Powered-By header · None
+
 
