@@ -142,7 +142,8 @@ Remove a folder's `.gitkeep` once it contains real files.
 - Final message: files changed · commands run + results · deviations from docs ·
   2–4 **suggested** notes for `AI_WORKLOG.md`.
 - **Never edit `AI_WORKLOG.md`. Never commit.** The owner reviews the diff and commits.
-
+- If a precondition or verification step fails, stop and report it. Never reinterpret
+  a failing check as passing.
 ## 12. Definition of done (per milestone)
 Criteria met · lint + format clean · tests pass · no secrets in code, logs or image ·
 docs updated if behaviour changed · PLAN.md progress log updated.
