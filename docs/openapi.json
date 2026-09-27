@@ -824,6 +824,34 @@
           }
         }
       }
+    },
+    "/v1/usage": {
+      "get": {
+        "summary": "Get usage metrics and aggregates",
+        "tags": ["Usage"],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usage analytics metrics"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Forbidden (admin role required for user_id filter)"
+          }
+        }
+      }
     }
   }
 }

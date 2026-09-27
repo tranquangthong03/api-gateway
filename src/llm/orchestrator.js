@@ -88,10 +88,54 @@ export class LLMOrchestrator {
     temperature,
     saveAssistantMessageFn = null,
     validateOutputFn = null,
+    cachedResult = null,
   }) {
     const startTime = performance.now();
 
     const { primaryProvider, primaryModel } = this.resolveTarget(requestedModel);
+
+    if (cachedResult) {
+      const latencyMs = Math.round(performance.now() - startTime);
+
+      await aiRequestRepo.createAiRequest({
+        userId,
+        apiKeyId,
+        conversationId,
+        messageId: null,
+        requestId,
+        endpoint,
+        provider: primaryProvider,
+        model: primaryModel,
+        isFallback: false,
+        isCached: true,
+        inputTokens: 0,
+        outputTokens: 0,
+        costUsd: 0.0,
+        latencyMs,
+        retryCount: 0,
+        status: 'success',
+        errorCode: null,
+        errorMessage: null,
+      });
+
+      return {
+        text: cachedResult.text,
+        parsedResult: cachedResult.parsedResult,
+        message_id: null,
+        usage: {
+          input_tokens: 0,
+          output_tokens: 0,
+        },
+        finish_reason: 'stop',
+        provider: primaryProvider,
+        model: primaryModel,
+        is_fallback: false,
+        cost_usd: 0.0,
+        latency_ms: latencyMs,
+        is_cached: true,
+      };
+    }
+
     const fallbackProvider = this.getFallbackProvider(primaryProvider);
 
     let currentProviderName = primaryProvider;

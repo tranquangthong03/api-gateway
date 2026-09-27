@@ -55,9 +55,9 @@ Deadline **2026-10-01 23:59**. One milestone per agent session. Tick boxes when 
 
 ## M5 — Rate limit, usage, cache (29/09)
 
-- [ ] `middleware/rate-limit.js` + headers + 429 with `Retry-After`
-- [ ] `GET /v1/usage` incl. `by_model` and admin filter; `core/time.js` for defaults
-- [ ] (bonus) analyze cache with `is_cached`
+- [x] `middleware/rate-limit.js` + headers + 429 with `Retry-After`
+- [x] `GET /v1/usage` incl. `by_model` and admin filter; `core/time.js` for defaults
+- [x] (bonus) analyze cache with `is_cached`
       **Accept:** tests for 429, usage math on seeded rows (success, error, cached, zero tokens).
 
 ## M6 — Deploy (29/09)
@@ -89,3 +89,4 @@ Deadline **2026-10-01 23:59**. One milestone per agent session. Tick boxes when 
 2026-09-26 · Antigravity (Gemini 3.6 Flash) · M2 Auth & API Keys · Implemented register/login endpoints, API key CRUD operations, GET /v1/auth/me, HS256 JWT & SHA-256 API key authentication middleware, OpenAPI documentation, and full integration test suite · Enforced HS256 JWT verification algorithm pinning; normalized email input to lowercase; returned identical 401 message for unknown email and wrong password; disabled X-Powered-By header · None
 2026-09-27 · Antigravity (Gemini 3.6 Flash) · M3 LLM Core · Implemented provider base class, Gemini/Groq adapters via openai SDK (maxRetries: 0), retry with exponential backoff & jitter, model pricing repository, cost calculator, ai_requests repository, orchestrator engine with routing, fallbacks, repair attempts, and comprehensive unit tests · Mapped model to provider dynamically; client_error (401/404) skips adapter retry but triggers fallback provider; missing usage defaults to 0 tokens with warning log; saveAssistantMessageFn failure writes ai_requests error row before throwing 500 · None
 2026-09-27 · Antigravity (Gemini 3.6 Flash) · M4 AI Endpoints & Conversations · Implemented POST /v1/ai/chat with transaction user message save and 20-message prompt history, POST /v1/ai/analyze for sentiment/summarize/extract tasks with code fence stripping, GET /v1/conversations (paginated list) and GET /v1/conversations/{id} (chronological history), OpenAPI documentation, Vitest integration tests, and live walkthrough against real providers · Returned HTTP 200 for both chat and analyze; attached conversation_id in error.details on LLM failures post-user message save; coerced limit and offset to numbers in pagination; updated validateQuery/validateParams to mutate property values instead of reassigning req.query/req.params getters · None
+2026-09-27 · Antigravity (Gemini 3.6 Flash) · M5 Rate limit, usage, cache · Implemented fixed-window rate limiter middleware with dynamic Retry-After header calculation and fail-open design, GET /v1/usage usage endpoint with bigint SQL sums, cost rounding to 6 decimals, non-admin user isolation and admin system-wide filtering, analyze Redis caching with 1-hour TTL and orchestrator audit logging (0 tokens, is_cached: true), OpenAPI registry update, and Vitest integration tests · Rate limit window keys set to 120s TTL for safe cleanup; non-admin users always filtered by own user_id regardless of query params; analyze cache hit passes cachedResult directly to orchestrator to enforce single-point ai_requests audit writing · None
