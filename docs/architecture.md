@@ -3,6 +3,7 @@
 ![Architecture](images/architecture.png)
 
 ## Component diagram
+
 ```mermaid
 flowchart TB
     C[Client apps] --> RID
@@ -26,17 +27,19 @@ flowchart TB
 ```
 
 ## Components and code location
-| Component | Folder | Responsibility | Must not |
-|---|---|---|---|
-| Request ID + log, Auth, Rate limiter | `src/middleware/` | request_id, access log, identify caller, quota | contain business logic |
-| Routes / controllers | `src/routes/` + `middleware/validate.js` + `src/schemas/` | validate input, call one service, map response | run SQL or call providers |
-| Services | `src/services/` | business flow (conversations, tasks, usage) | call providers directly |
-| Orchestrator | `src/llm/orchestrator.js` | choose provider/model, fallback, cost, write `ai_requests` | know about HTTP requests |
-| Provider adapters | `src/llm/*.adapter.js`, `retry.js` | provider calls, timeout, retry, normalize output | touch the database |
-| Repositories | `src/repositories/` | all SQL (parameterized) | contain business rules |
-| PostgreSQL, Redis | `src/infra/`, `migrations/` | connections, schema | — |
+
+| Component                            | Folder                                                    | Responsibility                                             | Must not                  |
+| ------------------------------------ | --------------------------------------------------------- | ---------------------------------------------------------- | ------------------------- |
+| Request ID + log, Auth, Rate limiter | `src/middleware/`                                         | request_id, access log, identify caller, quota             | contain business logic    |
+| Routes / controllers                 | `src/routes/` + `middleware/validate.js` + `src/schemas/` | validate input, call one service, map response             | run SQL or call providers |
+| Services                             | `src/services/`                                           | business flow (conversations, tasks, usage)                | call providers directly   |
+| Orchestrator                         | `src/llm/orchestrator.js`                                 | choose provider/model, fallback, cost, write `ai_requests` | know about HTTP requests  |
+| Provider adapters                    | `src/llm/*.adapter.js`, `retry.js`                        | provider calls, timeout, retry, normalize output           | touch the database        |
+| Repositories                         | `src/repositories/`                                       | all SQL (parameterized)                                    | contain business rules    |
+| PostgreSQL, Redis                    | `src/infra/`, `migrations/`                               | connections, schema                                        | —                         |
 
 ## Request flow — `POST /v1/ai/chat`
+
 1. Middleware assigns `request_id` and starts the access log line.
 2. Auth resolves the caller (API key or JWT) → 401 if invalid.
 3. Rate limiter checks quota in Redis → 429 if exceeded (not stored in `ai_requests`).
@@ -48,6 +51,7 @@ flowchart TB
 9. Success → ChatService saves the assistant message (linked via `message_id`) and returns 200. Failure → 502/504 in the standard error format.
 
 ## Key decisions
+
 - **Stateless gateway**: shared state (rate-limit counters, cache) lives in Redis, so several app instances can run behind a load balancer.
 - **Adapter pattern**: adding a provider means adding one adapter; the rest of the code is unchanged. Both providers use the `openai` SDK with SDK retries disabled, so the gateway is the only place that decides retries.
 - **Two kinds of logs**: the app log (pino, every request, stdout JSON) and `ai_requests` (AI calls only, source for `/usage`), joined by `request_id`.

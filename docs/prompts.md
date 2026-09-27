@@ -3,6 +3,7 @@
 Kept as evidence of how AI was used. Add every significant prompt you run.
 
 ## 1. First prompt — Milestone 1
+
 ```
 You are a senior Node.js backend engineer building the AI Gateway in this repository,
 a 7-day challenge project graded on architecture, security basics, API design, data
@@ -42,6 +43,7 @@ OUTPUT WHEN DONE
 ```
 
 ## 2. Next milestone (change N)
+
 ```
 Continue the AI Gateway project. Read AGENTS.md and the Progress log in docs/PLAN.md.
 Implement Milestone <N> only, with the same process: summary + file list + ambiguities
@@ -50,6 +52,7 @@ docs/PLAN.md; report as in AGENTS.md §11.
 ```
 
 ## 3. Cross-review (run with the other agent after each milestone)
+
 ```
 Act as a strict reviewer for this AI Gateway repository. Read AGENTS.md and docs/*.md.
 Review only the Milestone <N> changes (git diff <base>..HEAD). Do not modify files.
@@ -59,11 +62,13 @@ why it matters, suggested fix.
 ```
 
 ## 4. When the agent is wrong
+
 ```
 Stop. <what is wrong, with evidence: error output or doc section>.
 Explain the root cause first, then propose a fix. Do not change unrelated files.
 ```
 
 ## Log of prompts actually run
+
 | Date | Agent | Milestone | Prompt | Notes |
-|---|---|---|---|---|
+| ---- | ----- | --------- | ------ | ----- |
