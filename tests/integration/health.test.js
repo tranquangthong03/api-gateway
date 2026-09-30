@@ -14,13 +14,26 @@ describe('Health and Docs Endpoints', () => {
     await redis.quit();
   });
 
-  it('GET /health returns 200 with status ok when DB and Redis are connected', async () => {
+  it('GET / returns 200 with service info', async () => {
+    const res = await request.get('/');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      name: 'ai-gateway',
+      version: '1.0.0',
+      docs: '/docs',
+      health: '/health',
+    });
+    expect(res.headers['x-request-id']).toBeDefined();
+  });
+
+  it('GET /health returns 200 with status ok when DB, Redis, and Schema are ready', async () => {
     const res = await request.get('/health');
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       status: 'ok',
       db: 'ok',
       redis: 'ok',
+      schema: 'ok',
     });
     expect(res.headers['x-request-id']).toBeDefined();
   });
@@ -33,6 +46,21 @@ describe('Health and Docs Endpoints', () => {
       status: 'error',
       db: 'error',
       redis: 'ok',
+      schema: 'ok',
+    });
+    expect(res.headers['x-request-id']).toBeDefined();
+    spy.mockRestore();
+  });
+
+  it('GET /health returns 503 with status error when schema check fails', async () => {
+    const spy = vi.spyOn(dbInfra, 'checkSchemaHealth').mockResolvedValueOnce(false);
+    const res = await request.get('/health');
+    expect(res.status).toBe(503);
+    expect(res.body).toEqual({
+      status: 'error',
+      db: 'ok',
+      redis: 'ok',
+      schema: 'error',
     });
     expect(res.headers['x-request-id']).toBeDefined();
     spy.mockRestore();
