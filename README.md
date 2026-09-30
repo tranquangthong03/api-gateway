@@ -149,7 +149,35 @@ See [docs/database.md](docs/database.md) and generated schema dump [docs/schema.
 - **Cost Calculation**: Calculated dynamically from `model_pricing` repository rows (`input_price_per_1k` and `output_price_per_1k`).
 
 ---
+## Error handling strategy
 
+**One error format everywhere.** Every error from every endpoint returns
+`{ "error": { "code", "message", "request_id", "details" } }`. `code` is stable for
+programs, `message` is for people. Full list: [docs/error-codes.md](docs/error-codes.md).
+
+**Traceable by request_id.** Every response carries `X-Request-ID`. Every 5xx is logged
+at error level with `request_id`, code, method, path and stack trace, so a failing request
+can be found in the logs from the id the client received. Stack traces are never returned.
+
+**No information leaks.** Invalid, revoked or expired credentials all return the same 401.
+Another user's resource returns 404, not 403. Provider error bodies are never forwarded
+to clients; at most 500 characters are stored in `ai_requests.error_message`.
+
+**Provider failures (in order).**
+1. Timeout per call (`PROVIDER_TIMEOUT_MS`, 30 s); SDK retries disabled.
+2. Retry up to `PROVIDER_MAX_RETRIES` (2) with exponential backoff and jitter, only for
+   timeouts, connection errors, 429 and 5xx. Other 4xx are never retried.
+3. Fallback once to the other provider, also after a 4xx such as an invalid key.
+4. Invalid structured output: one repair call, then 502 with `error_code = invalid_output`.
+5. All attempts failed: 504 `PROVIDER_TIMEOUT` or 502 `PROVIDER_ERROR`.
+
+Every AI request writes exactly one `ai_requests` row, on success and on failure, so
+`error_rate` in `/v1/usage` is accurate.
+
+**Infrastructure failures.** `/health` returns 503 with the failing component
+(`db`, `redis` or `schema`) and a 2-second timeout per check. Losing the database or Redis
+connection never crashes the process. If Redis is down, rate limiting fails open (requests
+are allowed and a warning is logged).
 ## Usage Metrics
 
 The `GET /v1/usage` endpoint summarizes usage over a specified time window (defaulting to the last 24 hours):
