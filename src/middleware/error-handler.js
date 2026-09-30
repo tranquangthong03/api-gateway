@@ -16,6 +16,19 @@ export const errorHandler = (err, req, res, _next) => {
   const requestId = req.id || res.getHeader('X-Request-ID') || null;
 
   if (err instanceof AppError) {
+    if (err.status >= 500) {
+      logger.error(
+        {
+          request_id: requestId,
+          code: err.code,
+          method: req.method,
+          path: req.originalUrl,
+          err,
+        },
+        `5xx Application Error: ${err.message}`,
+      );
+    }
+
     const errorBody = {
       code: err.code,
       message: err.message,
@@ -39,7 +52,16 @@ export const errorHandler = (err, req, res, _next) => {
   }
 
   // Handle unexpected standard errors (500)
-  logger.error({ err, request_id: requestId }, 'Unhandled application error');
+  logger.error(
+    {
+      request_id: requestId,
+      code: 'INTERNAL_ERROR',
+      method: req.method,
+      path: req.originalUrl,
+      err,
+    },
+    'Unhandled application error',
+  );
 
   return res.status(500).json({
     error: {

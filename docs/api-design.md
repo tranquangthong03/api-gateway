@@ -14,11 +14,12 @@ Errors: see `error-codes.md`.
 
 ## Endpoints
 
-| Method | Path      | Auth | Success                     |
-| ------ | --------- | ---- | --------------------------- |
-| GET    | `/health` | none | 200 `{ status, db, redis }` |
+| Method | Path      | Auth | Success                               |
+| ------ | --------- | ---- | ------------------------------------- |
+| GET    | `/`       | none | 200 `{ name, version, docs, health }` |
+| GET    | `/health` | none | 200 `{ status, db, redis, schema }`   |
 
-`/health` returns 503 with the `HealthResponse` shape (not the standard error format) so callers can see which dependency failed.
+`/health` returns 503 with the `HealthResponse` shape (not the standard error format) if any of `db`, `redis`, or `schema` readiness checks fail so callers and load balancers can see which component failed.
 | POST | `/v1/auth/register` | none | 201 user (never includes the hash) |
 | POST | `/v1/auth/login` | none | 200 `{ access_token, token_type, expires_in }` |
 | GET | `/v1/auth/me` | key or JWT | 200 `{ user_id, email, role, auth_type }` |

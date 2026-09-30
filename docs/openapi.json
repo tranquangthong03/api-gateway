@@ -38,9 +38,31 @@
           "redis": {
             "type": "string",
             "enum": ["ok", "error"]
+          },
+          "schema": {
+            "type": "string",
+            "enum": ["ok", "error"]
           }
         },
-        "required": ["status", "db", "redis"]
+        "required": ["status", "db", "redis", "schema"]
+      },
+      "RootResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "docs": {
+            "type": "string"
+          },
+          "health": {
+            "type": "string"
+          }
+        },
+        "required": ["name", "version", "docs", "health"]
       },
       "ErrorResponse": {
         "type": "object",
@@ -310,10 +332,50 @@
     "parameters": {}
   },
   "paths": {
+    "/": {
+      "get": {
+        "summary": "Root info",
+        "description": "Returns service name, version, and links to documentation and health check.",
+        "tags": ["System"],
+        "responses": {
+          "200": {
+            "description": "Root service info",
+            "content": {
+              "application/json": {
+                "example": {
+                  "name": "ai-gateway",
+                  "version": "1.0.0",
+                  "docs": "/docs",
+                  "health": "/health"
+                },
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "version": {
+                      "type": "string"
+                    },
+                    "docs": {
+                      "type": "string"
+                    },
+                    "health": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["name", "version", "docs", "health"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "summary": "Health check",
-        "description": "Checks connectivity to PostgreSQL database and Redis cache.",
+        "description": "Checks connectivity to PostgreSQL database, Redis cache, and database migration schema readiness.",
         "tags": ["System"],
         "responses": {
           "200": {
@@ -323,7 +385,8 @@
                 "example": {
                   "status": "ok",
                   "db": "ok",
-                  "redis": "ok"
+                  "redis": "ok",
+                  "schema": "ok"
                 },
                 "schema": {
                   "type": "object",
@@ -339,9 +402,13 @@
                     "redis": {
                       "type": "string",
                       "enum": ["ok", "error"]
+                    },
+                    "schema": {
+                      "type": "string",
+                      "enum": ["ok", "error"]
                     }
                   },
-                  "required": ["status", "db", "redis"]
+                  "required": ["status", "db", "redis", "schema"]
                 }
               }
             }
@@ -353,7 +420,8 @@
                 "example": {
                   "status": "error",
                   "db": "error",
-                  "redis": "ok"
+                  "redis": "ok",
+                  "schema": "error"
                 },
                 "schema": {
                   "type": "object",
@@ -369,9 +437,13 @@
                     "redis": {
                       "type": "string",
                       "enum": ["ok", "error"]
+                    },
+                    "schema": {
+                      "type": "string",
+                      "enum": ["ok", "error"]
                     }
                   },
-                  "required": ["status", "db", "redis"]
+                  "required": ["status", "db", "redis", "schema"]
                 }
               }
             }

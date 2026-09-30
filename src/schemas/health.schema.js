@@ -7,6 +7,14 @@ export const healthResponseSchema = z.object({
   status: z.enum(['ok', 'error']),
   db: z.enum(['ok', 'error']),
   redis: z.enum(['ok', 'error']),
+  schema: z.enum(['ok', 'error']),
+});
+
+export const rootResponseSchema = z.object({
+  name: z.string(),
+  version: z.string(),
+  docs: z.string(),
+  health: z.string(),
 });
 
 export const errorResponseSchema = z.object({

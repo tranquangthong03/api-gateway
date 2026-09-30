@@ -5,7 +5,11 @@ import {
 } from '@asteasolutions/zod-to-openapi';
 import swaggerUi from 'swagger-ui-express';
 import { z } from 'zod';
-import { healthResponseSchema, errorResponseSchema } from '../schemas/health.schema.js';
+import {
+  healthResponseSchema,
+  rootResponseSchema,
+  errorResponseSchema,
+} from '../schemas/health.schema.js';
 import {
   registerSchema,
   loginSchema,
@@ -26,6 +30,7 @@ extendZodWithOpenApi(z);
 export const registry = new OpenAPIRegistry();
 
 registry.register('HealthResponse', healthResponseSchema);
+registry.register('RootResponse', rootResponseSchema);
 registry.register('ErrorResponse', errorResponseSchema);
 registry.register('RegisterInput', registerSchema);
 registry.register('LoginInput', loginSchema);
@@ -53,9 +58,34 @@ const securityApiKey = registry.registerComponent('securitySchemes', 'ApiKeyAuth
 // System
 registry.registerPath({
   method: 'get',
+  path: '/',
+  summary: 'Root info',
+  description: 'Returns service name, version, and links to documentation and health check.',
+  tags: ['System'],
+  responses: {
+    200: {
+      description: 'Root service info',
+      content: {
+        'application/json': {
+          schema: rootResponseSchema,
+          example: {
+            name: 'ai-gateway',
+            version: '1.0.0',
+            docs: '/docs',
+            health: '/health',
+          },
+        },
+      },
+    },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
   path: '/health',
   summary: 'Health check',
-  description: 'Checks connectivity to PostgreSQL database and Redis cache.',
+  description:
+    'Checks connectivity to PostgreSQL database, Redis cache, and database migration schema readiness.',
   tags: ['System'],
   responses: {
     200: {
@@ -63,7 +93,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: healthResponseSchema,
-          example: { status: 'ok', db: 'ok', redis: 'ok' },
+          example: { status: 'ok', db: 'ok', redis: 'ok', schema: 'ok' },
         },
       },
     },
@@ -72,7 +102,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: healthResponseSchema,
-          example: { status: 'error', db: 'error', redis: 'ok' },
+          example: { status: 'error', db: 'error', redis: 'ok', schema: 'error' },
         },
       },
     },

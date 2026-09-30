@@ -42,6 +42,8 @@ Set in Railway service settings dashboard (secrets never committed to repository
 ### Commands & Health Check
 
 - **Pre-deploy command**: `npm run migrate`
+  > [!WARNING]
+  > **CRITICAL PRE-DEPLOYMENT REQUIREMENT**: The pre-deploy command `npm run migrate` **must be configured and saved in Railway service settings before the initial deployment**. If omitted, the service will build and start as `Active` (passing basic TCP health checks), but incoming API calls requiring database tables will fail with HTTP 500 errors. `/health` now validates database schema readiness (`schema: "ok"`) and returns `503 Service Unavailable` if migrations have not been applied.
 - **Healthcheck Path**: `/health`
 - **Start Command**: Empty (uses Dockerfile `CMD ["node", "src/server.js"]`)
 
@@ -68,7 +70,7 @@ $base = "https://api-gateway-production-3321.up.railway.app"
 
 Write-Host "=== 1. Health Check ==="
 $health = Invoke-RestMethod -Uri "$base/health" -Method Get
-Write-Host "Health Status: $($health.status), DB: $($health.services.database), Redis: $($health.services.redis)"
+Write-Host "Health Status: $($health.status), DB: $($health.db), Redis: $($health.redis), Schema: $($health.schema)"
 
 Write-Host "`n=== 2. API Docs ==="
 $docs = Invoke-WebRequest -Uri "$base/docs/" -Method Get

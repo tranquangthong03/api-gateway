@@ -1,0 +1,888 @@
+{
+  "info": {
+    "_postman_id": "7a29e4bf-942f-4889-a292-628d3f1bf321",
+    "name": "AI Gateway API Collection",
+    "description": "Postman v2.1 collection covering all AI Gateway endpoints and error conditions in sequence.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Root GET /",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            ""
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Contains service metadata', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.name).to.eql('ai-gateway');",
+              "    pm.expect(jsonData.version).to.eql('1.0.0');",
+              "    pm.expect(jsonData.docs).to.eql('/docs');",
+              "    pm.expect(jsonData.health).to.eql('/health');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Health GET /health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Reports db, redis, and schema status ok', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.status).to.eql('ok');",
+              "    pm.expect(jsonData.db).to.eql('ok');",
+              "    pm.expect(jsonData.redis).to.eql('ok');",
+              "    pm.expect(jsonData.schema).to.eql('ok');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Auth Register",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "var uniqueEmail = 'postman.' + Date.now() + '@example.com';",
+              "pm.environment.set('email', uniqueEmail);"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "pm.test('Returns created user object', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.email).to.eql(pm.environment.get('email'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/auth/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "auth",
+            "register"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. Auth Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Saves JWT access_token', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.access_token).to.be.a('string');",
+              "    pm.environment.set('jwt', jsonData.access_token);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Auth Me",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/v1/auth/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "auth",
+            "me"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Returns authenticated user info', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.email).to.eql(pm.environment.get('email'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Create API Key",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Test Key\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/api-keys",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "api-keys"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "pm.test('Saves raw API key and ID', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.key).to.be.a('string');",
+              "    pm.expect(jsonData.id).to.be.a('string');",
+              "    pm.environment.set('api_key', jsonData.key);",
+              "    pm.environment.set('api_key_id', jsonData.id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. List API Keys",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/v1/api-keys",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "api-keys"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Returns array of API keys', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Chat New Conversation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Hello! My name is Alice.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/ai/chat",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "ai",
+            "chat"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Saves new conversation_id', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.conversation_id).to.be.a('string');",
+              "    pm.environment.set('conversation_id', jsonData.conversation_id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Chat Follow-up Conversation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"conversation_id\": \"{{conversation_id}}\",\n  \"message\": \"What is my name?\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/ai/chat",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "ai",
+            "chat"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Analyze Sentiment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"task\": \"sentiment\",\n  \"text\": \"The service performance is outstanding!\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/ai/analyze",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "ai",
+            "analyze"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Returns structured sentiment result', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.task).to.eql('sentiment');",
+              "    pm.expect(jsonData.result).to.have.property('sentiment');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Analyze Summarize",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"task\": \"summarize\",\n  \"text\": \"AI Gateway acts as a central proxy for LLMs handling rate limiting and fallback mechanisms.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/ai/analyze",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "ai",
+            "analyze"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Returns structured summary result', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.task).to.eql('summarize');",
+              "    pm.expect(jsonData.result).to.have.property('summary');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "12. Analyze Extract",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"task\": \"extract\",\n  \"text\": \"Contact support@example.com or visit https://example.com for help.\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/ai/analyze",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "ai",
+            "analyze"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Returns structured extraction result', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.task).to.eql('extract');",
+              "    pm.expect(jsonData.result).to.have.property('people');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "13. Conversations List",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/v1/conversations?limit=10&offset=0",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "conversations"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "offset",
+              "value": "0"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Returns conversations list array', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.items).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "14. Conversation Detail",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/v1/conversations/{{conversation_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "conversations",
+            "{{conversation_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Returns message history', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.id).to.eql(pm.environment.get('conversation_id'));",
+              "    pm.expect(jsonData.messages).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "15. Usage Metrics",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/v1/usage",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "usage"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Returns usage analytics summary', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('requests');",
+              "    pm.expect(jsonData).to.have.property('tokens');",
+              "    pm.expect(jsonData).to.have.property('estimated_cost_usd');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "16. Error 400 Validation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/auth/register",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 400', function () {",
+              "    pm.response.to.have.status(400);",
+              "});",
+              "pm.test('Error code is VALIDATION_ERROR', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.error.code).to.eql('VALIDATION_ERROR');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "17. Error 401 Bad API Key",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "gw_invalid_key_123456"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/v1/auth/me",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "auth",
+            "me"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 401', function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "pm.test('Error code is UNAUTHORIZED', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.error.code).to.eql('UNAUTHORIZED');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "18. Error 403 API Key on /v1/api-keys",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-API-Key",
+            "value": "{{api_key}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Forbidden Key\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/v1/api-keys",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "api-keys"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 403', function () {",
+              "    pm.response.to.have.status(403);",
+              "});",
+              "pm.test('Error code is FORBIDDEN', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.error.code).to.eql('FORBIDDEN');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "19. Error 404 Other User Conversation",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/v1/conversations/00000000-0000-0000-0000-000000000000",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "conversations",
+            "00000000-0000-0000-0000-000000000000"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 404', function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "pm.test('Error code is NOT_FOUND', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.error.code).to.eql('NOT_FOUND');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "20. Revoke API Key",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/v1/api-keys/{{api_key_id}}",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "api-keys",
+            "{{api_key_id}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 204', function () {",
+              "    pm.response.to.have.status(204);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}

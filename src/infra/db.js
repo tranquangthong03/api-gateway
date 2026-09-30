@@ -25,3 +25,29 @@ export const checkDbHealth = async (timeoutMs = 2000) => {
     return false;
   }
 };
+
+export const checkSchemaHealth = async (timeoutMs = 2000) => {
+  try {
+    const checkPromise = (async () => {
+      const fs = await import('node:fs/promises');
+      const path = await import('node:path');
+      const migrationsDir = path.resolve(process.cwd(), 'migrations');
+      const files = await fs.readdir(migrationsDir);
+      const migrationFiles = files.filter((f) => !f.startsWith('.'));
+
+      const res = await pool.query('SELECT COUNT(*)::int AS count FROM pgmigrations');
+      const appliedCount = res.rows[0]?.count ?? -1;
+
+      return appliedCount === migrationFiles.length && migrationFiles.length > 0;
+    })();
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Schema health check timeout')), timeoutMs),
+    );
+
+    return await Promise.race([checkPromise, timeoutPromise]);
+  } catch (err) {
+    logger.error({ err: err.message }, 'Schema health check failed');
+    return false;
+  }
+};

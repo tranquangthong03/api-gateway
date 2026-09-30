@@ -68,10 +68,10 @@ Deadline **2026-10-01 23:59**. One milestone per agent session. Tick boxes when 
 
 ## M7 — Deliverables (30/09 – 01/10)
 
-- [ ] `docs/openapi.json` and `docs/schema.sql` regenerated
-- [ ] Postman collection + environment (`base_url`, `jwt`, `api_key`), every endpoint + key error cases
-- [ ] README complete; limitations listed
-- [ ] Final pass: lint, tests, remove dead code and leftover `.gitkeep`
+- [x] `docs/openapi.json` and `docs/schema.sql` regenerated
+- [x] Postman collection + environment (`base_url`, `jwt`, `api_key`), every endpoint + key error cases
+- [x] README complete; limitations listed
+- [x] Final pass: lint, tests, remove dead code and leftover `.gitkeep`
 
 ## Submission checklist
 
@@ -91,3 +91,4 @@ Deadline **2026-10-01 23:59**. One milestone per agent session. Tick boxes when 
 2026-09-27 · Antigravity (Gemini 3.6 Flash) · M4 AI Endpoints & Conversations · Implemented POST /v1/ai/chat with transaction user message save and 20-message prompt history, POST /v1/ai/analyze for sentiment/summarize/extract tasks with code fence stripping, GET /v1/conversations (paginated list) and GET /v1/conversations/{id} (chronological history), OpenAPI documentation, Vitest integration tests, and live walkthrough against real providers · Returned HTTP 200 for both chat and analyze; attached conversation_id in error.details on LLM failures post-user message save; coerced limit and offset to numbers in pagination; updated validateQuery/validateParams to mutate property values instead of reassigning req.query/req.params getters · None
 2026-09-27 · Antigravity (Gemini 3.6 Flash) · M5 Rate limit, usage, cache · Implemented fixed-window rate limiter middleware with dynamic Retry-After header calculation and fail-open design, GET /v1/usage usage endpoint with bigint SQL sums, cost rounding to 6 decimals, non-admin user isolation and admin system-wide filtering, analyze Redis caching with 1-hour TTL and orchestrator audit logging (0 tokens, is_cached: true), OpenAPI registry update, and Vitest integration tests · Rate limit window keys set to 120s TTL for safe cleanup; non-admin users always filtered by own user_id regardless of query params; analyze cache hit passes cachedResult directly to orchestrator to enforce single-point ai_requests audit writing · None
 2026-09-27 · Antigravity (Gemini 3.6 Flash) · M6 Deploy (Repository Part) · Prepared repository for Railway production deployment: updated npm scripts to use --env-file-if-exists=.env, added npm start script, copied migrations in Dockerfile, bound server to 0.0.0.0, added provider config startup warnings without secret leakage, updated docs/deployment.md with Railway setup, release steps, PowerShell smoke-test script, and rollback procedure, and verified containerized production startup without .env file via Docker compose · Kept Docker CMD as node src/server.js without --env-file flag; verified npm run migrate executes in container without .env file · None
+2026-09-30 · Antigravity (Gemini 3.6 Flash) · M7 Deliverables · Implemented GET / root endpoint, schema readiness check in GET /health (comparing migrations/ files count with pgmigrations table rows, returning 503 if unmigrated), 5xx request ID log traceability with error level top-level request_id/code/method/path/stack trace, Postman collection (v2.1) & environment files covering 20 endpoints/error cases with automated token saving, regenerated docs/openapi.json and docs/schema.sql, wrote comprehensive README.md, updated docs/deployment.md with pre-deploy warning, and cleaned up leftover .gitkeep files · Schema check in /health queries pgmigrations and validates count against migrations folder files; 5xx errors log request_id as top-level property for log tracing; Postman scripts dynamically populate jwt, api_key, and conversation_id · None
